@@ -53,4 +53,4 @@ Claude Code with subagents. The Workflow tool makes the loop deterministic; with
 
 ## License
 
-Private. Shared by invitation. Do not redistribute without asking.
+MIT. See `LICENSE`.
