@@ -159,10 +159,18 @@ swarm-runs/<YY-MMDD-slug>/
   log.jsonl          append-only events, one JSON object per line
   progress.html      rendered from log.jsonl by render_progress.py
   SUMMARY.md         written at the end
+  HANDOFF-lead.md    Lead's resume point, rewritten at every pause or end of session
+  HANDOFF-<role>-<piece>-<iter>.md   one per agent session that ended or was told to restart
   STOP               human creates it to halt the run
 ```
 
 On this machine the default root is `C:\Users\godot\_agents\x-temp\swarm-runs\`. On LX it is `~/swarm-runs/`.
+
+The run directory and every work file under it are never deleted. Only git worktrees created for judging or building may be removed.
+
+### Handoff
+
+Every agent session (Lead, Builder, Critic, Keeper, Reviewer) ends by writing `HANDOFF-<role>-<piece>-<iter>.md` in the run dir, when it finishes or when it is told the session will restart. The Lead writes `HANDOFF-lead.md` at every pause or end of session and points the user to it. Skeleton: `templates/HANDOFF.md`. Contents: role and brief; machine rules in force; status (done, mid-work, blocked); the verdict or build result; the exact gap text for the next agent; what is already verified (do not re-verify); repo state (branch, HEAD, unpushed commits, dirty files and which lane owns them, worktrees left); caps from `GOAL.md`; global rules in force; what is still pending from this agent (ideally nothing).
 
 ## Claude Code mapping
 
@@ -182,11 +190,13 @@ One knob sets the model and effort for every role. Judges are never weaker than 
 
 | Tier | Use for | Lead | Builder | Critic | Keeper | Reviewer | Final votes | Default caps |
 |---|---|---|---|---|---|---|---|---|
-| `absolute` | Ship-grade, commercial, cost is not the constraint | fable high | fable xhigh | fable xhigh | opus high | fable xhigh | 3 | 10 per piece, 60 total |
+| `absolute` | Ship-grade, commercial, cost is not the constraint | fable high | opus high | fable high | opus high | fable high | 3 | 10 per piece, 60 total |
 | `strong` (default) | Serious work that a human will act on | opus high | opus high | opus high | sonnet medium | opus high | 1 | 8 per piece, 40 total |
 | `quick` | Drafts, exploration, cheap first pass | sonnet medium | sonnet medium | sonnet medium | haiku low | sonnet medium | 1 | 4 per piece, 20 total |
 
-Overrides: `models: {critic: {model:'fable', effort:'xhigh'}}` on top of any tier. The scribe (log lines, summary) is always haiku low.
+Overrides: `models: {critic: {model:'fable', effort:'high'}}` on top of any tier. The scribe (log lines, summary) is always haiku low. Effort `xhigh` is never used. Mechanical work (recon, classification, log rendering, sweeps, assembly) runs sonnet in every tier.
+
+The Agent tool has no effort knob. Effort is set through the agent definitions shipped under `agents/` (`swarm-critic.md` fable high, `swarm-builder.md` opus high, `swarm-mech.md` sonnet), installed by copying to `~/.claude/agents/`, and through the Workflow tool's `agent(prompt, {model, effort})`.
 
 "Final votes 3" means the first Critic that picks ours triggers two more fresh Critics with different lenses (first-time reader, correctness). Majority decides. The dissenter's gap feeds the next round.
 
@@ -230,6 +240,8 @@ What those two skills can take back from here: the `STOP` file, `log.jsonl` plus
 - Summaries instead of artifacts for the Critic or the Reviewer. They judge the real thing or they judge nothing.
 - Re-running the Keeper on every iteration. It is a periodic check, not a gate.
 - Over-specifying the Builder. Give it the slice, the gap and the Rules. Let it work.
+- A session that ends without a handoff loses the run state. Every agent writes `HANDOFF-<role>-<piece>-<iter>.md`; the Lead writes `HANDOFF-lead.md` at every pause.
+- The Lead doing work itself. It is a Chief of Staff: it dispatches everything, reads summaries, verdicts and the log, and keeps its context for decisions.
 
 ## Design notes
 

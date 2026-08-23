@@ -23,6 +23,7 @@ Do not use for a one-shot answer, a single small edit, or when no Bar can be nam
 2. Propose 2 or 3 concrete, fetchable Bars. Each one: what it is, where it lives, why it is slightly above reach, and which mode it implies (`ab` or `checklist`). The user picks one. Never start with a Bar the user has not seen. If the user already gave a Bar, confirm it is fetchable and move on.
 3. Collect hard Rules (constraints that never bend: tone, stack, language, length, data that must not leave the machine).
 4. Pick the **tier**, the **interaction mode** and the **domain profile** (tables in `ARCHITECTURE.md`). Tier sets model and effort for every role: `absolute` (fable everywhere, 3-vote acceptance, caps 10/60), `strong` (opus, default, caps 8/40), `quick` (sonnet, caps 4/20). Judges are never weaker than builders. Mode `ask` proposes and lets the user choose, and pauses on a stall; `autonomous` picks defaults and never pauses (always on LX). Profile `ui`, `analysis`, `code` or `doc` sets what the pieces are and what the Critic opens. Caps can be overridden per run.
+   Effort: `absolute` means judges and votes run Fable at effort `high` (never `xhigh`), Builders run Opus at `high`, mechanical work (recon, classification, log rendering, sweeps, assembly) runs Sonnet. The Agent tool has no effort knob. Effort is set through the agent definitions in `~/.claude/agents/` (`swarm-critic.md` model fable effort high, `swarm-builder.md` model opus effort high, `swarm-mech.md` model sonnet) and through the Workflow tool's `agent(prompt, {model, effort})`. The three definitions ship in this skill under `agents/`; install them by copying to `~/.claude/agents/` before the first spawn.
 5. Create the run directory `swarm-runs/<YY-MMDD-slug>/` (local root: `C:\Users\godot\_agents\x-temp\swarm-runs\`; on LX: `~/swarm-runs/`). Copy `templates/render_progress.py` into it. Write `GOAL.md` from `templates/GOAL.md`. It is immutable from this point.
 6. Decide where it runs. More than about 6 parallel agents or more than an hour of expected work: dispatch to LX with the `lx-dispatch` skill. Otherwise run locally.
 
@@ -60,7 +61,7 @@ When every piece is `won`, `stalled` or `capped`: spawn the **Reviewer** (`roles
 
 ### 6. Close
 
-Write `SUMMARY.md`: table of pieces with status, iterations, last gap, path; Keeper and Reviewer verdicts; the progress page path. Report to the user in the i-have-adhd format: what won, what stalled or capped and why, where the files are, what a human should look at first.
+Write `SUMMARY.md`: table of pieces with status, iterations, last gap, path; Keeper and Reviewer verdicts; the progress page path. Write `HANDOFF-lead.md` from `templates/HANDOFF.md` (status, verdicts, repo state, caps, what is pending) and point the user to it. The Lead writes `HANDOFF-lead.md` at every pause as well, not only at the end. Report to the user in the i-have-adhd format: what won, what stalled or capped and why, where the files are, what a human should look at first.
 
 ## Hard rules for the Lead
 
@@ -70,6 +71,8 @@ Write `SUMMARY.md`: table of pieces with status, iterations, last gap, path; Kee
 - Caps are enforced in code or by you, never negotiated by an agent.
 - `STOP` in the run directory halts everything at the next boundary. Check it before every spawn when driving by hand.
 - Never let the Critic use a summary. Paths to the real files only.
+- Handoff. Every agent session in the run (Lead, Builder, Critic, Keeper, Reviewer) ends by writing `HANDOFF-<role>-<piece>-<iter>.md` in the run dir, when it finishes or when it is told the session will restart. Skeleton in `templates/HANDOFF.md`. The Lead writes `HANDOFF-lead.md` at every pause or end of session and points the user to it. The run dir and every work file under it are never deleted; only git worktrees created for judging or building may be removed.
+- Dispatch everything, guard your context. You are a Chief of Staff: every build, judgement, recon and mechanical step goes to an agent. You read only summaries, verdicts and the log, and keep your context for decisions.
 
 ## Files in this skill
 
@@ -82,7 +85,11 @@ Write `SUMMARY.md`: table of pieces with status, iterations, last gap, path; Kee
 | `roles/keeper.md` | Keeper prompt template |
 | `roles/reviewer.md` | Whole-Stack Reviewer prompt template |
 | `roles/smoother.md` | Smoother prompt template |
+| `agents/swarm-critic.md` | Agent definition: Critic and votes, fable, effort high. Copy to `~/.claude/agents/` |
+| `agents/swarm-builder.md` | Agent definition: Builder, opus, effort high. Copy to `~/.claude/agents/` |
+| `agents/swarm-mech.md` | Agent definition: mechanical worker, sonnet. Copy to `~/.claude/agents/` |
 | `templates/GOAL.md` | Immutable goal file skeleton |
+| `templates/HANDOFF.md` | Handoff skeleton every agent session writes at its end or before a restart |
 | `templates/prompt.md` | Paste-ready Lead prompt for a plain session without this skill |
 | `templates/workflow.js` | Workflow tool script: the loop engine |
 | `templates/render_progress.py` | Turns `log.jsonl` into `progress.html` |
