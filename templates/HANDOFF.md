@@ -9,7 +9,7 @@ Iteration: <n>
 Brief in two lines: <what this session was asked to do>
 
 ## Machine rules in force
-<local or LX, concurrency cap, render hook, tier, effort per role>
+<local or studio, concurrency cap, render hook, tier, effort per role>
 
 ## Status
 <done | mid-work | blocked>. One line on what that means here.

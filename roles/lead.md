@@ -7,7 +7,7 @@ Before the first spawn
 - [ ] Run directory created, `render_progress.py` copied in
 - [ ] Bar pinned under `bar/` by a dedicated agent, `{ok:true}` received
 - [ ] `pieces.json` written and sanity-checked (judgeable alone, one concern each)
-- [ ] Decided local vs LX
+- [ ] Decided local vs studio
 - [ ] Agent definitions installed: `agents/swarm-critic.md` (fable, high), `agents/swarm-builder.md` (opus, high), `agents/swarm-mech.md` (sonnet) copied to `~/.claude/agents/`. The Agent tool has no effort knob; effort comes from these files or from the Workflow tool's `agent(prompt, {model, effort})`
 
 Every iteration
@@ -33,7 +33,7 @@ When all pieces are done
 At every pause or end of session
 - [ ] Write `HANDOFF-lead.md` in the run dir from `templates/HANDOFF.md`, overwriting the previous one
 - [ ] Role and brief: Lead, the run slug, the goal in two lines
-- [ ] Machine rules in force (local vs LX, concurrency cap, render hook)
+- [ ] Machine rules in force (local vs studio, concurrency cap, render hook)
 - [ ] Status: done, mid-work or blocked, and on which pieces
 - [ ] Last verdict or build result per active piece
 - [ ] The exact gap text the next Builder call must receive, per piece

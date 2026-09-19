@@ -139,7 +139,7 @@ termination:
   keeper_every: 10                        # total iterations between Keeper checks
   critic_votes: 1                         # 3 for majority on final acceptance
   require_whole_stack_review: true
-  max_wall_time: null                     # optional, enforced by the human or LX
+  max_wall_time: null                     # optional, enforced by the human or the dispatch host (studio)
   human_stop: STOP                        # file name in the run dir
 ```
 
@@ -164,7 +164,7 @@ swarm-runs/<YY-MMDD-slug>/
   STOP               human creates it to halt the run
 ```
 
-On this machine the default root is `C:\Users\godot\_agents\x-temp\swarm-runs\`. On LX it is `~/swarm-runs/`.
+On this machine the default root is `C:\Users\godot\_agents\x-temp\swarm-runs\`. On studio it is `~/swarm-runs/`.
 
 The run directory and every work file under it are never deleted. Only git worktrees created for judging or building may be removed.
 
@@ -182,7 +182,7 @@ Every agent session (Lead, Builder, Critic, Keeper, Reviewer) ends by writing `H
 | Blinding | Done in script code. The Critic prompt receives paths labelled A and B only |
 | Progress page | Each agent appends to `log.jsonl` and runs `render_progress.py` as its last step |
 | Human stop | `STOP` file. Every Builder prompt starts with "if STOP exists, return stopped" |
-| Heavy runs | Dispatch to LX with the lx-dispatch skill. Wide local fan-out bluescreens the laptop |
+| Heavy runs | Dispatch to studio with the lx-dispatch skill. Wide local fan-out bluescreens the laptop |
 
 ## Performance tiers
 
@@ -205,7 +205,7 @@ The Agent tool has no effort knob. Effort is set through the agent definitions s
 | Mode | Intake | During the run | Stall |
 |---|---|---|---|
 | `ask` (default when a human is present) | Proposes 2 or 3 Bars and a tier, user picks | Runs without questions | Lead asks the human (AskUserQuestion) whether to accept best effort, change the gap, or stop |
-| `autonomous` (default on LX, cron, dispatch) | Picks the first proposed Bar and `strong` unless told otherwise, records the choice in GOAL.md | Never pauses | Marks `stalled`, moves on, reports at the end |
+| `autonomous` (default on studio, cron, dispatch) | Picks the first proposed Bar and `strong` unless told otherwise, records the choice in GOAL.md | Never pauses | Marks `stalled`, moves on, reports at the end |
 
 `STOP` works in both modes.
 
